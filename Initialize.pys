@@ -1,0 +1,26 @@
+import pymysql,sqlite3
+from datetime import date, timedelta
+
+conn = pymysql.connect('79.142.57.187',port=46177,user='wogadmin',passwd = '3u1rUSsR',db='mmg-fa')
+cur = conn.cursor()
+FIELDS = [''' 'ПУ  "ЖЕТЫБАЙМУНАЙГАЗ"' ''',''' 'ПУ  "КАЛАМКАСМУНАЙГАЗ"' ''']
+TimeLine = ["'020000'","'040000'","'060000'","'080000'","'100000'",
+"'120000'","'140000'","'160000'","'180000'","'200000'","'220000'","'000000'","'015900'"]
+
+cur.execute('DROP TABLE IF EXISTS hoursDlc_copy2')
+cur.execute('''
+CREATE TABLE hoursDlc_copy2 (pu VARCHAR(30),cdng VARCHAR(20),mrID INT(10),data CHAR(10),time VARCHAR(20),Tin INT(10),
+jidkPredDnya FLOAT,jidkDenNakl FLOAT,jidkPrognoz FLOAT,jidkPrognozNakl FLOAT, jidkTehRej FLOAT, jidkTehRejNakl FLOAT,
+neftPredDnya FLOAT,neftDenNakl FLOAT,neftPrognoz FLOAT,neftPrognozNakl FLOAT,neftTehRej FLOAT,neftTehRejNakl FLOAT,
+sdachaPredDnya FLOAT,sdachaDenNakl FLOAT,sdachaPrognoz FLOAT,sdachaPrognozNakl FLOAT)''')
+Index = 0
+for i in FIELDS:
+	today = date.today()
+	t = today.strftime("'%Y-%m-%d'")
+	for j in TimeLine:
+		cur.execute('''INSERT INTO hoursDlc_copy2(jidkTehRejNakl,neftTehRejNakl,jidkTehRej,neftTehRej,cdng,data,Tin,jidkPrognoz,jidkPrognozNakl,jidkPredDnya,jidkDenNakl,
+			neftPrognoz,neftPrognozNakl,neftPredDnya,neftDenNakl,sdachaPrognoz,sdachaPrognozNakl,sdachaPredDnya,sdachaDenNakl,
+			pu,mrID,time) VALUES(0,0,0,0,0,'''+t+''',1,0,0,0,0,0,0,0,0,0,0,0,0,'''+ FIELDS[Index]+','+str(Index)+','+j+');')
+	Index+=1
+conn.commit()
+cur.close()
